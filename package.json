@@ -1,0 +1,14 @@
+{
+  "name": "nineonesix-fantasy-draft-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal, locally hosted Yahoo Fantasy draft assistant.",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
