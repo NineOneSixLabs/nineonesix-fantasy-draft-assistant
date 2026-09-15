@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import https from 'node:https';
 import { getConfig } from './config.mjs';
 import { buildAuthorizationUrl, createPkceTransaction, exchangeAuthorizationCode } from './oauth.mjs';
+import { verifyFantasyAccess } from './yahoo.mjs';
 
 const config = getConfig();
 const transactions = new Map();
@@ -72,6 +73,19 @@ const server = https.createServer({
       return send(response, 200, html('Authorization complete', '<h1>Authorization complete</h1><p>The credentials are held only in application memory and were not logged or written to disk.</p><p><a href="/">Return home</a></p>'));
     } catch (error) {
       return send(response, 502, html('Authorization failed', `<h1>Authorization failed</h1><p>${String(error.message).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>`));
+    }
+  }
+
+  if (request.method === 'GET' && url.pathname === '/api/check') {
+    if (!tokenState?.access_token) {
+      return send(response, 401, html('Authorization required', '<h1>Authorization required</h1><p><a href="/auth/start">Authorize with Yahoo</a></p>'));
+    }
+
+    try {
+      await verifyFantasyAccess({ accessToken: tokenState.access_token });
+      return send(response, 200, html('Access confirmed', '<h1>Fantasy Sports API access confirmed</h1><p>The read-only check succeeded. Yahoo response data was discarded and was not displayed, logged, or stored.</p>'));
+    } catch (error) {
+      return send(response, 502, html('Access check failed', `<h1>Fantasy Sports API access was not confirmed</h1><p>${String(error.message).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</p>`));
     }
   }
 

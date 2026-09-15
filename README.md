@@ -35,3 +35,5 @@ Requirements:
 - A `.env` file created from `.env.example`
 
 Run the synthetic unit tests with `npm test`. Once the local certificate files are configured, start the application with `npm start` and open `https://localhost:8787`.
+
+After authorization, `/api/check` performs a minimal read-only permission check. It deliberately discards the Yahoo response and returns only whether access succeeded.
